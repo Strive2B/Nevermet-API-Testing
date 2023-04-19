@@ -318,6 +318,88 @@ def get_messages():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+    
+@app.route('/report_user', methods=['POST'])
+def report_user():
+    try:
+        data = request.get_json()
+        user_id = data['user_id']
+        reason = data['reason']
+        auth_token = request.headers.get('Authorization').split()[1]
+        timestamp = int(request.headers.get('Timestamp'))
+        device_id = request.headers.get('Device-ID')
+        app_id = request.headers.get('App-ID')
+        app_version = request.headers.get('App-Version')
+        os = request.headers.get('OS')
+
+        url = f'https://prod.nevermet.io/users/{user_id}/report'
+        headers = {
+            'Authorization': f'Bearer {auth_token}',
+            'Timestamp': str(timestamp),
+            'Device-ID': device_id,
+            'App-ID': app_id,
+            'App-Version': app_version,
+            'OS': os
+        }
+        params = {'reason': reason}
+        response = requests.post(url, headers=headers, params=params)
+        return jsonify(response.json())
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/block_user', methods=['POST'])
+def block_user():
+    try:
+        data = request.get_json()
+        user_id = data['user_id']
+        auth_token = request.headers.get('Authorization').split()[1]
+        timestamp = int(request.headers.get('Timestamp'))
+        device_id = request.headers.get('Device-ID')
+        app_id = request.headers.get('App-ID')
+        app_version = request.headers.get('App-Version')
+        os = request.headers.get('OS')
+
+        url = f'https://prod.nevermet.io/users/{user_id}/block'
+        headers = {
+            'Authorization': f'Bearer {auth_token}',
+            'Timestamp': str(timestamp),
+            'Device-ID': device_id,
+            'App-ID': app_id,
+            'App-Version': app_version,
+            'OS': os
+        }
+        response = requests.post(url, headers=headers)
+        return jsonify(response.json())
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/get_block_list', methods=['GET'])
+def get_block_list():
+    try:
+        auth_token = request.headers.get('Authorization').split()[1]
+        timestamp = int(request.headers.get('Timestamp'))
+        device_id = request.headers.get('Device-ID')
+        app_id = request.headers.get('App-ID')
+        app_version = request.headers.get('App-Version')
+        os = request.headers.get('OS')
+
+        url = 'https://prod.nevermet.io/users/blocked'
+        headers = {
+            'Authorization': f'Bearer {auth_token}',
+            'Timestamp': str(timestamp),
+            'Device-ID': device_id,
+            'App-ID': app_id,
+            'App-Version': app_version,
+            'OS': os
+        }
+        response = requests.get(url, headers=headers)
+        return jsonify(response.json())
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
 
 if __name__ == '__main__':
     app.run()
